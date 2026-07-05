@@ -10,7 +10,14 @@ from google import genai
 # ==========================================================
 # 📡 GLOBAL CLOUD INTELLIGENCE SERVER ENGINE
 # ==========================================================
-api_key = st.secrets.get("GEMINI_API_KEY") or st.sidebar.text_input("Enter Gemini API Key", type="password")
+# Using .get() prevents Streamlit from throwing a KeyError if the secret doesn't exist yet!
+secret_key = st.secrets.get("GEMINI_API_KEY", None)
+
+# If it's not in secrets, show the password input box in the sidebar
+if not secret_key:
+    api_key = st.sidebar.text_input("Enter Gemini API Key", type="password")
+else:
+    api_key = secret_key
 
 if api_key:
     client = genai.Client(api_key=api_key)
