@@ -5,27 +5,25 @@ import cv2
 import requests
 import json
 import matplotlib.pyplot as plt
-from google import genai
+from google import genai  # Make sure you are using the new SDK import
 
-st.set_page_config(page_title="⚔️ CHAMPIONSHIP COMMAND CORE", layout="wide", initial_sidebar_state="expanded")
-
-# ==========================================
+# =========================================================
 # 🔑 CREDENTIAL CONFIGURATION (CLOUD SECURE)
-# ==========================================
-# Safely reads from secrets or sidebar fallback input without throwing KeyErrors!
+# =========================================================
+# 1. First, check if the key is safely hidden in Streamlit Secrets
 secret_key = st.secrets.get("GEMINI_API_KEY", None)
 
 if not secret_key:
-    api_key = st.sidebar.text_input("AQ.Ab8RN6IFeugYwa8CADaJFzaSR50_qWjFRQ51tExLTMo9OGHLTg", type="password")
+    # 2. If it's not in secrets, show a clean password input box (with NO default key leaked in the label!)
+    api_key = st.sidebar.text_input("Enter Gemini API Key", type="password")
 else:
     api_key = secret_key
 
+# Initialize the Gemini client using the proper new SDK syntax
 client = None
-api_ready = False
 if api_key:
     try:
         client = genai.Client(api_key=api_key)
-        api_ready = True
     except Exception:
         pass
 
@@ -33,14 +31,15 @@ if api_key:
 # 📡 GLOBAL CLOUD INTELLIGENCE ROUTER
 # ==========================================
 def query_local_ollama(prompt, model_name="gemini-2.5-flash"):
-    """
-    Kept your original function name so your entire app architecture doesn't break,
-    but routes the request completely to the cloud Gemini engine.
-    """
-    if not api_ready or not client:
-        return "⚠️ Cloud GenAI node unconfigured. Please enter your Gemini API Key in the sidebar to activate the intelligence engine."
+    if not client:
+        return "⚠️ Cloud GenAI node unconfigured. Please enter your Gemini API Key in the sidebar."
+        
     try:
-        response = client.models.generate_content(model=model_name, contents=prompt)
+        # Proper syntax for the new google-genai library
+        response = client.models.generate_content(
+            model=model_name,
+            contents=prompt
+        )
         return response.text
     except Exception as e:
         return f"⚠️ Cloud Generation Fault: {str(e)}"
