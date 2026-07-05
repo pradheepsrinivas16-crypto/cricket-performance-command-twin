@@ -1,1 +1,7 @@
-
+streamlit
+pandas
+numpy
+opencv-python-headless
+requests
+matplotlib
+google-genai
