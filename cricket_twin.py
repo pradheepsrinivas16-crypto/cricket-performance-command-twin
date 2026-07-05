@@ -5,25 +5,27 @@ import cv2
 import requests
 import json
 import matplotlib.pyplot as plt
-from google import genai  # Make sure you are using the new SDK import
+from google import genai
 
-# =========================================================
+st.set_page_config(page_title="⚔️ CHAMPIONSHIP COMMAND CORE", layout="wide", initial_sidebar_state="expanded")
+
+# ==========================================
 # 🔑 CREDENTIAL CONFIGURATION (CLOUD SECURE)
-# =========================================================
-# 1. First, check if the key is safely hidden in Streamlit Secrets
+# ==========================================
+# Safely reads from secrets or sidebar fallback input without throwing KeyErrors!
 secret_key = st.secrets.get("GEMINI_API_KEY", None)
 
 if not secret_key:
-    # 2. If it's not in secrets, show a clean password input box (with NO default key leaked in the label!)
     api_key = st.sidebar.text_input("Enter Gemini API Key", type="password")
 else:
     api_key = secret_key
 
-# Initialize the Gemini client using the proper new SDK syntax
 client = None
+api_ready = False
 if api_key:
     try:
         client = genai.Client(api_key=api_key)
+        api_ready = True
     except Exception:
         pass
 
@@ -31,15 +33,10 @@ if api_key:
 # 📡 GLOBAL CLOUD INTELLIGENCE ROUTER
 # ==========================================
 def query_local_ollama(prompt, model_name="gemini-2.5-flash"):
-    if not client:
-        return "⚠️ Cloud GenAI node unconfigured. Please enter your Gemini API Key in the sidebar."
-        
+    if not api_ready or not client:
+        return "⚠️ Cloud GenAI node unconfigured. Please enter your Gemini API Key in the sidebar to activate the intelligence engine."
     try:
-        # Proper syntax for the new google-genai library
-        response = client.models.generate_content(
-            model=model_name,
-            contents=prompt
-        )
+        response = client.models.generate_content(model=model_name, contents=prompt)
         return response.text
     except Exception as e:
         return f"⚠️ Cloud Generation Fault: {str(e)}"
@@ -218,7 +215,7 @@ with tab2:
                 event = f"🎯 DOT BALL! Consecutive Dots: {st.session_state.consecutive_dots}"
             else:
                 st.session_state.consecutive_dots = 0
-                event = f"runs into space."
+                event = f"🏃 Rotation: {run_change} run(s) into space."
 
         st.session_state.current_score += run_change
         st.session_state.current_wickets += wicket_change
@@ -317,10 +314,12 @@ with tab3:
                         ### 📈 PAST PROFILE MECHANICS
                         * **Core Structural Strength**: (Specify exactly what was stable, e.g., head position, foot stride, or shoulder loading alignment)
                         * **Controlled Vulnerability Boundary**: (What hidden trait was masked by high efficiency)
-                        * ### 📉 PRESENT PERFORMANCE DRIFT
+                        
+                        ### 📉 PRESENT PERFORMANCE DRIFT
                         * **Identified Technical Failure Mode**: (Explicitly name the breakdown, e.g., dropped wrists, unbraced front leg, falling shoulder line)
                         * **Emergent Structural Weakness**: (How this geometric deviation prevents clean execution and triggers dismissal/leakage maps)
-                        * ### 🛠️ PRESCRIPTIVE REPAIR DIRECTIVE
+                        
+                        ### 🛠️ PRESCRIPTIVE REPAIR DIRECTIVE
                         * **Biomechanical Correction Protocol**: (Step-by-step physical adjustment commands to eradicate the mistake immediately)
                         * **Drill Simulation Prescription**: (Specify 2 world-class professional practice cage drills to lock the correction down)
                         """
